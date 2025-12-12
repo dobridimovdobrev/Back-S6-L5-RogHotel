@@ -5,6 +5,7 @@ namespace RogHotel.Models.Entity
 {
     public class ApplicationUser : IdentityUser
     {
+        public bool IsDeleted { get; set; }
 
         [Required(ErrorMessage = "Nome obbligatorio")]
         [StringLength(50)]
@@ -13,6 +14,8 @@ namespace RogHotel.Models.Entity
         [Required(ErrorMessage = "Cognome obbligatorio")]
         [StringLength(50)]
         public string Cognome { get; set; }
+
+        public DateTime DataCreazione { get; set; }
 
     }
 }
