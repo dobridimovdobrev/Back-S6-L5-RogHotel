@@ -1,6 +1,8 @@
-﻿namespace RogHotel.Models.Entity
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace RogHotel.Models.Entity
 {
-    public class ApplicationRole
+    public class ApplicationRole : IdentityRole
     {
     }
 }
