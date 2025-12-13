@@ -1,22 +1,213 @@
-html {
-  font-size: 14px;
+/* SPIEGAZIONE: Container principale occupa tutta l'altezza della viewport */
+.login-container {
+    min-height: 100vh;
+    overflow: hidden;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+/* SPIEGAZIONE: Wrapper del form con padding e larghezza massima */
+.login-form-wrapper {
+    width: 100%;
+    max-width: 450px;
+    padding: 2rem;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+/* SPIEGAZIONE: Sezione immagine occupa tutta l'altezza */
+.login-image-section {
+    height: 100vh;
+    overflow: hidden;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+/* SPIEGAZIONE: Immagine di sfondo con effetti */
+.login-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
-body {
-  margin-bottom: 60px;
+/* SPIEGAZIONE: Overlay scuro (40% opacità) per leggibilità testo */
+.login-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+    z-index: 1;
+}
+
+/* SPIEGAZIONE: Citazione posizionata in basso con padding */
+.login-quote {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 3rem;
+    z-index: 2;
+}
+
+/* SPIEGAZIONE: Spaziatura lettere per effetto elegante */
+.tracking-wide {
+    letter-spacing: 2px;
+}
+
+/* SPIEGAZIONE: Input più grandi e spaziosi */
+.form-control-lg {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+}
+
+/* SPIEGAZIONE: Bottone con effetto hover */
+.btn-primary {
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+
+/* SPIEGAZIONE: Responsivo - su mobile l'immagine va sopra */
+@media (max-width: 768px) {
+    .login-image-section {
+        height: 300px;
+        order: -1; /* Va prima del form */
+    }
+
+    .login-form-wrapper {
+        padding: 2rem 1rem;
+    }
+}
+
+
+/* css per sidebar menu e per la pagina home*/
+
+/* Sidebar Styles */
+#wrapper {
+    min-height: 100vh;
+}
+
+#sidebar-wrapper {
+    min-height: 100vh;
+    width: 250px;
+    transition: margin 0.25s ease-out;
+    display: flex;
+    flex-direction: column;
+}
+
+#page-content-wrapper {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+.sidebar-heading {
+    background-color: #fff;
+}
+
+.sidebar-logo {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+}
+
+.sidebar-section-title {
+    padding: 1rem 1.5rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.list-group-item {
+    border: none;
+    padding: 0.75rem 1.5rem;
+    color: #495057;
+    transition: all 0.2s;
+}
+
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+        color: #0d6efd;
+    }
+
+    .list-group-item.active {
+        background-color: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+        border-left: 3px solid #0d6efd;
+    }
+
+.sidebar-user {
+    margin-top: auto;
+}
+
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* Responsive Sidebar */
+@media (max-width: 768px) {
+    #sidebar-wrapper {
+        margin-left: -250px;
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: 0;
+    }
+}
+
+/* Stats Cards */
+.stat-card {
+    border-radius: 0.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+    }
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.badge-change {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Table Styles */
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.action-buttons {
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+tr:hover .action-buttons {
+    opacity: 1;
+}
+
+.custom-marginTop {
+    margin-top: 6px;
 }

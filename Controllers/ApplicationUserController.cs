@@ -76,11 +76,6 @@ namespace RogHotel.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
-
             return View(request);
         }
 
@@ -103,7 +98,6 @@ namespace RogHotel.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError(string.Empty, "Email o password non validi");
                 return View(request);
             }
 
@@ -118,7 +112,6 @@ namespace RogHotel.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            ModelState.AddModelError(string.Empty, "Email o password non validi");
             return View(request);
         }
 

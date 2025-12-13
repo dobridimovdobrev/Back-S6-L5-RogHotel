@@ -9,6 +9,7 @@ namespace RogHotel.Models.Entity
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
+
         }
 
         // non mi e chiaro anche se non succede nulla perche usarli, tanto identtity ce li ha queste

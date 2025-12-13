@@ -1,5 +1,428 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Gestione Clienti - Hotel Manager";
 }
+
+<div class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex overflow-hidden">
+    <!-- Side Navigation -->
+    <aside class="w-64 bg-surface-light dark:bg-surface-dark border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0 h-screen transition-all duration-300 relative z-20 hidden md:flex">
+        <div class="p-6 flex items-center gap-3">
+            <div class="h-10 w-10 rounded-lg bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-white shadow-lg shadow-primary/30">
+                <span class="material-symbols-outlined filled text-2xl">apartment</span>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg tracking-tight">Hotel Manager</h1>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Admin Panel</p>
+            </div>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-1">
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group"
+               asp-controller="Dashboard" asp-action="Index">
+                <span class="material-symbols-outlined group-hover:text-primary transition-colors">dashboard</span>
+                <span class="font-medium text-sm">Dashboard</span>
+            </a>
+
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary dark:text-blue-400 transition-colors"
+               asp-controller="Clienti" asp-action="Index">
+                <span class="material-symbols-outlined filled">group</span>
+                <span class="font-medium text-sm">Clienti</span>
+            </a>
+
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group" href="#">
+                <span class="material-symbols-outlined group-hover:text-primary transition-colors">bedroom_parent</span>
+                <span class="font-medium text-sm">Camere</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group" href="#">
+                <span class="material-symbols-outlined group-hover:text-primary transition-colors">calendar_month</span>
+                <span class="font-medium text-sm">Prenotazioni</span>
+            </a>
+            <a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group" href="#">
+                <span class="material-symbols-outlined group-hover:text-primary transition-colors">badge</span>
+                <span class="font-medium text-sm">Dipendenti</span>
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-slate-200 dark:border-slate-800">
+            <div class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors">
+                <div class="h-9 w-9 rounded-full bg-slate-200 dark:bg-slate-700 bg-cover bg-center"
+                     style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAg95KLzQbEJJqvSw6VNalKSaQs916rNl59KYCcXlMDQRdBC0btdP2kHNA7UIC-EDnjCzlidl2jjVYp9W-rIt7g8EXscYbY9c4ZE3N-dEGBRr7OmiVcS6vXTIcsLQ7OApPhe9b9M4K-e1kNd7fDMENKVt0QUU7E8ywAdxdgwv_OQBC2ZKdbenB7nlGCJZHBabLaOg405GrxEX5YhBM3UJihLq8YPQRj9We11DVNEtXU0YoO34v6b2J1-q_7pran8bMFd-xRYdTU67eX');">
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium truncate">Admin User</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 truncate">admin@hotel.com</p>
+                </div>
+                <span class="material-symbols-outlined text-slate-400 text-sm">logout</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
+        <!-- Header / Top Bar (mobile) -->
+        <header class="h-16 bg-surface-light dark:bg-surface-dark border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 shrink-0 md:hidden">
+            <div class="flex items-center gap-3">
+                <button class="text-slate-500 hover:text-primary">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <span class="font-bold text-lg">Hotel Manager</span>
+            </div>
+            <div class="h-8 w-8 rounded-full bg-slate-200 bg-cover bg-center"
+                 style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAHM9T4642-XI64xz9l6BVKhXsMjric-YniXLuPAthdTkI65_mjXuDtjcoWcQwZcDCg64J6aMkldHQDFg2e6z9erYTkCtagcb4yfSi68t8y-LQyUptQdri1zlTF_qv2Lz1G6iCEg_7T6lvEsT5dsJFusiP6ReA2hi3RvBCASnL3TQkpZqXtHXjnzg1jmxskLPSWllCzwePIxq7Op0tIa0KZGEJCdasZRCUZ3YpWKx6acs3CaCplL23jc2GhNGgWEW5mNTnSNZ6IVdEW');">
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8">
+            <div class="max-w-7xl mx-auto flex flex-col gap-6">
+                <!-- Breadcrumbs & Heading -->
+                <div class="flex flex-col gap-4">
+                    <nav aria-label="Breadcrumb" class="flex text-sm font-medium text-slate-500 dark:text-slate-400">
+                        <ol class="inline-flex items-center space-x-2">
+                            <li class="inline-flex items-center">
+                                <a href="#" class="hover:text-primary transition-colors">Home</a>
+                            </li>
+                            <li>
+                                <span class="mx-1 text-slate-300">/</span>
+                            </li>
+                            <li aria-current="page">
+                                <span class="text-primary">Gestione Clienti</span>
+                            </li>
+                        </ol>
+                    </nav>
+
+                    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                        <div class="flex flex-col gap-1">
+                            <h2 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Gestione Clienti</h2>
+                            <p class="text-slate-500 dark:text-slate-400 text-base">
+                                Visualizza, modifica e gestisci l'anagrafica dei clienti.
+                            </p>
+                        </div>
+
+                        <a asp-controller="Clienti" asp-action="Create"
+                           class="bg-primary hover:bg-blue-600 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium transition-all shadow-lg shadow-primary/20 shrink-0">
+                            <span class="material-symbols-outlined text-[20px]">add</span>
+                            Nuovo Cliente
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Filters & Toolbar -->
+                <div class="bg-surface-light dark:bg-surface-dark p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+                    <!-- Search -->
+                    <div class="relative w-full md:w-96 group">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+                        </div>
+                        <input type="text"
+                               class="block w-full pl-10 pr-3 py-2.5 border-none ring-1 ring-slate-200 dark:ring-slate-700 rounded-lg leading-5 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 sm:text-sm transition-shadow"
+                               placeholder="Cerca per nome, email o telefono..." value="" />
+                    </div>
+
+                    <!-- Filter Chips -->
+                    <div class="flex gap-2 overflow-x-auto pb-1 w-full md:w-auto no-scrollbar">
+                        <button class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-primary/10 text-primary border border-primary/20 transition-colors whitespace-nowrap">
+                            Tutti
+                        </button>
+                        <button class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 border border-transparent transition-colors whitespace-nowrap">
+                            VIP
+                        </button>
+                        <button class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 border border-transparent transition-colors whitespace-nowrap">
+                            Standard
+                        </button>
+                        <button class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 border border-transparent transition-colors whitespace-nowrap gap-1">
+                            Archiviati
+                            <span class="material-symbols-outlined text-[18px]">expand_more</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Data Table -->
+                <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-800">
+                            <thead class="bg-slate-50 dark:bg-slate-800/50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-10">
+                                        <input type="checkbox" class="rounded border-slate-300 text-primary focus:ring-primary/30 h-4 w-4 bg-transparent" />
+                                    </th>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider cursor-pointer hover:text-primary group flex items-center gap-1">
+                                        Cliente
+                                        <span class="material-symbols-outlined text-[16px] text-slate-400 group-hover:text-primary">arrow_downward</span>
+                                    </th>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                        Email
+                                    </th>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                        Telefono
+                                    </th>
+                                    <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                        Stato
+                                    </th>
+                                    <th scope="col" class="px-6 py-4 text-right text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                        Azioni
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody class="bg-surface-light dark:bg-surface-dark divide-y divide-slate-200 dark:divide-slate-800">
+                                <!-- Row 1 -->
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <input type="checkbox" class="rounded border-slate-300 text-primary focus:ring-primary/30 h-4 w-4 bg-transparent" />
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-10 shrink-0 rounded-full bg-slate-200 bg-cover bg-center"
+                                                 style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAxii6SQb9_Eqdtwed65BBEaGeWicpWWnLSgPtmz0cUQGNJACCye7bwQ0bj7DgcOP9gzOZwzUZkosxfq7Na7H0sF-V8aTZPQ-mjkmtzZWl2fqK92TX3Xb-hd2neLReRSTAnveoG-1LdZv8AzhV6o1-lYhRKtbYd_0IhPEd65-Y-NXfeoIV9CjVTbDEyYhrI7VYqgA5YSKjrmxksW0Ojgk2yFmJku2asAFQdrjArnx7Yv2x2nxTECQLUaKhBx7s6qemluEPQiGrah53P');">
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-slate-900 dark:text-white">Mario Rossi</div>
+                                                <div class="text-xs text-slate-500 dark:text-slate-400 md:hidden">mario.rossi@gmail.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-slate-600 dark:text-slate-300">mario.rossi@gmail.com</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-slate-600 dark:text-slate-300">+39 333 1234567</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                            VIP
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button class="text-slate-400 hover:text-primary transition-colors p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700" title="Modifica">
+                                                <span class="material-symbols-outlined text-[20px]">edit</span>
+                                            </button>
+                                            <button class="text-slate-400 hover:text-red-600 transition-colors p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20" title="Elimina">
+                                                <span class="material-symbols-outlined text-[20px]">delete</span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Row 2 -->
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <input type="checkbox" class="rounded border-slate-300 text-primary focus:ring-primary/30 h-4 w-4 bg-transparent" />
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-10 shrink-0 rounded-full bg-slate-200 bg-cover bg-center"
+                                                 style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCSto7mbulDR4kGvP8Q9qmhqc3cXsbwEcXXjlsZmuk4lgSaRXU7mqV6XdEU0X3YbvytgiEt4Rocf0zORso5maX2Cmp3ciDGS5ArrV5RMuVcnFV_6AdAWvqphWAkk3SODR3A3H0rXZTbsI5KxScKvbpwFW2rMMcn2eSGuH52-AiDzfsXcwM8h5t7nLw0evCtZexXx0ifue_JUoGEfFMgzBLSls0UJJuDLcdi6rqDNUDHsbA21FifA9rD4UuE1Q7MreDG5b_mNAUx1hlY');">
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-slate-900 dark:text-white">Laura Bianchi</div>
+                                                <div class="text-xs text-slate-500 dark:text-slate-400 md:hidden">laura.bianchi@hotmail.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-slate-600 dark:text-slate-300">laura.bianchi@hotmail.com</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-slate-600 dark:text-slate-300">+39 340 9876543</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300">
+                                            Standard
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button class="text-slate-400 hover:text-primary transition-colors p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700" title="Modifica">
+                                                <span class="material-symbols-outlined text-[20px]">edit</span>
+                                            </button>
+                                            <button class="text-slate-400 hover:text-red-600 transition-colors p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20" title="Elimina">
+                                                <span class="material-symbols-outlined text-[20px]">delete</span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Row 3 -->
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <input type="checkbox" class="rounded border-slate-300 text-primary focus:ring-primary/30 h-4 w-4 bg-transparent" />
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-10 shrink-0 rounded-full bg-cover bg-center"
+                                                 style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDE9_dmARbEe3InJcB-CzdIvOXYO5VmG6xEQq3pxJynyZbXHF8IeJDeYwCHotYlF1rMSD8cQe6m03VSwwQs_7pBvDNmv67eCMBtwVLSeD-suW9NAIJxx2wB1rUUVLOqwynxzJPxzl4JszrsEpcstm2QclwLZMsayxw93s8s8VgGL885R7xseg3XssXKboz2Gpo4s-M32D2GNN23Kn49m8bCT3_8B6wFzfZB-cXzPCVQghXrMadEymW-ejRvQTIcBEK7ZE984Ee4XNFq');">
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-slate-900 dark:text-white">Giuseppe Verdi</div>
+                                                <div class="text-xs text-slate-500 dark:text-slate-400 md:hidden">g.verdi@company.it</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-slate-600 dark:text-slate-300">g.verdi@company.it</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-slate-600 dark:text-slate-300">+39 328 5551234</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300">
+                                            Standard
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button class="text-slate-400 hover:text-primary transition-colors p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700" title="Modifica">
+                                                <span class="material-symbols-outlined text-[20px]">edit</span>
+                                            </button>
+                                            <button class="text-slate-400 hover:text-red-600 transition-colors p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20" title="Elimina">
+                                                <span class="material-symbols-outlined text-[20px]">delete</span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Row 4 -->
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <input type="checkbox" class="rounded border-slate-300 text-primary focus:ring-primary/30 h-4 w-4 bg-transparent" />
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-10 shrink-0 rounded-full bg-cover bg-center"
+                                                 style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCczrJQQ3Ennw8vD0ujRt07aQO9DeiOaTsm0wcC6g132KVvoxkNef6LS3j1PkkCgZYQ8FT2f2dbNVrPCSHmVk6oLjem8Feo5kgydd4ciV-fBLMIR6vHiWuOH9aG8X-7fV4dppVoSF5ttEJWQZ5UOIfu6eS1qlcW77k97lS6I0C4Y8c9QsHvFcDzuN3HxJCZ4vJXPJEwIcVkB5lX66JfQ6n385BzgqnM3I2Qjoesb3AiROGThs5dSyj9eajUtr13uT2nI95HZCt1fIz_');">
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-slate-900 dark:text-white">Anna Costa</div>
+                                                <div class="text-xs text-slate-500 dark:text-slate-400 md:hidden">anna.costa@libero.it</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-slate-600 dark:text-slate-300">anna.costa@libero.it</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-slate-600 dark:text-slate-300">+39 339 0011223</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                            VIP
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button class="text-slate-400 hover:text-primary transition-colors p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700" title="Modifica">
+                                                <span class="material-symbols-outlined text-[20px]">edit</span>
+                                            </button>
+                                            <button class="text-slate-400 hover:text-red-600 transition-colors p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20" title="Elimina">
+                                                <span class="material-symbols-outlined text-[20px]">delete</span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Row 5 -->
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <input type="checkbox" class="rounded border-slate-300 text-primary focus:ring-primary/30 h-4 w-4 bg-transparent" />
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-10 shrink-0 rounded-full bg-cover bg-center"
+                                                 style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAimeXRPSeoA_50Dao50DLhTLTqdiWLqu3Jc0tiV4NlVleGAaU0nDSC2gqUMBfVQEEKCIkFviojRkgfUd9GIghcvPE5RMA4spCdysiP1z_YlJk4NQG4MT7Pf4ltvYyzcTpKabDvdTrQ04S9rM8VqIagiX5GBKShVl9WRvy_TDZFZ9gPr-JbMrqFc35Qzq3opw_s4BkvknsIjw-Owp7BOTKAzFRXwKyShantU000eiO2JwPFTvZohfOPal63Ikj6GLqIafZC33nfR9wR');">
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-slate-900 dark:text-white">Francesco Romano</div>
+                                                <div class="text-xs text-slate-500 dark:text-slate-400 md:hidden">f.romano@gmail.com</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-slate-600 dark:text-slate-300">f.romano@gmail.com</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-slate-600 dark:text-slate-300">+39 351 9898989</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300">
+                                            Standard
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button class="text-slate-400 hover:text-primary transition-colors p-1 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700" title="Modifica">
+                                                <span class="material-symbols-outlined text-[20px]">edit</span>
+                                            </button>
+                                            <button class="text-slate-400 hover:text-red-600 transition-colors p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20" title="Elimina">
+                                                <span class="material-symbols-outlined text-[20px]">delete</span>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination Footer -->
+                    <div class="bg-surface-light dark:bg-surface-dark px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                        <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm text-slate-700 dark:text-slate-300">
+                                    Visualizzati <span class="font-medium text-slate-900 dark:text-white">1</span> a
+                                    <span class="font-medium text-slate-900 dark:text-white">5</span> di
+                                    <span class="font-medium text-slate-900 dark:text-white">128</span> risultati
+                                </p>
+                            </div>
+                            <div>
+                                <nav aria-label="Pagination" class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                                    <a href="#"
+                                       class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                                        <span class="sr-only">Precedente</span>
+                                        <span class="material-symbols-outlined text-[20px]">chevron_left</span>
+                                    </a>
+                                    <a href="#"
+                                       aria-current="page"
+                                       class="z-10 bg-primary/10 border-primary text-primary relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                        1
+                                    </a>
+                                    <a href="#"
+                                       class="bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 relative inline-flex items-center px-4 py-2 border text-sm font-medium transition-colors">
+                                        2
+                                    </a>
+                                    <a href="#"
+                                       class="bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 relative inline-flex items-center px-4 py-2 border text-sm font-medium transition-colors">
+                                        3
+                                    </a>
+                                    <span class="relative inline-flex items-center px-4 py-2 border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium text-slate-700">
+                                        ...
+                                    </span>
+                                    <a href="#"
+                                       class="bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-700 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 relative inline-flex items-center px-4 py-2 border text-sm font-medium transition-colors">
+                                        8
+                                    </a>
+                                    <a href="#"
+                                       class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                                        <span class="sr-only">Successivo</span>
+                                        <span class="material-symbols-outlined text-[20px]">chevron_right</span>
+                                    </a>
+                                </nav>
+                            </div>
+                        </div>
+
+                        <!-- Mobile Pagination -->
+                        <div class="flex items-center justify-between w-full sm:hidden">
+                            <a href="#"
+                               class="relative inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50">
+                                Precedente
+                            </a>
+                            <a href="#"
+                               class="ml-3 relative inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50">
+                                Successivo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
