@@ -1,5 +1,112 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model List<RogHotel.Models.Entity.Prenotazione>
 @{
+    ViewData["Title"] = "Gestione Prenotazioni";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold mb-1">Gestione Prenotazioni</h2>
+                </div>
+                <a asp-controller="Prenotazione" asp-action="Create" class="btn btn-primary">
+                    <i class="bi bi-plus-lg"></i> Nuova Prenotazione
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="prenotazioniTable">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="px-4 py-3">Cliente</th>
+                                    <th class="px-4 py-3">Camera</th>
+                                    <th class="px-4 py-3">Check-in</th>
+                                    <th class="px-4 py-3">Check-out</th>
+                                    <th class="px-4 py-3">Stato</th>
+                                    <th class="px-4 py-3 text-end">Azioni</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@* modal *@
+<tbody>
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var prenotazione in Model)
+        {
+            <tr>
+                <td class="px-4 py-3">@prenotazione.Cliente?.Nome @prenotazione.Cliente?.Cognome</td>
+                <td class="px-4 py-3">@prenotazione.Camera?.Numero</td>
+                <td class="px-4 py-3">@prenotazione.DataInizio.ToString("dd/MM/yyyy")</td>
+                <td class="px-4 py-3">@prenotazione.DataFine.ToString("dd/MM/yyyy")</td>
+                <td class="px-4 py-3">
+                    @if (prenotazione.Stato == "Confermata")
+                    {
+                        <span class="badge bg-success">@prenotazione.Stato</span>
+                    }
+                    else if (prenotazione.Stato == "Annullata")
+                    {
+                        <span class="badge bg-danger">@prenotazione.Stato</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-info">@prenotazione.Stato</span>
+                    }
+                </td>
+                <td class="px-4 py-3 text-end">
+                    <div class="btn-group">
+                        <a asp-controller="Prenotazione" asp-action="Edit" asp-route-id="@prenotazione.PrenotazioneId" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal@prenotazione.PrenotazioneId">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+
+            <!-- Delete Modal -->
+            <div class="modal fade" id="deleteModal@prenotazione.PrenotazioneId" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Conferma Eliminazione</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            Sei sicuro di voler eliminare questa prenotazione?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                            <form asp-controller="Prenotazione" asp-action="Delete" asp-route-id="@prenotazione.PrenotazioneId" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-danger">Elimina</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</tbody>
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('#prenotazioniTable').DataTable({
+                order: [[2, 'desc']]
+            });
+        });
+    </script>
 }

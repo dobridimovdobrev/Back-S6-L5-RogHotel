@@ -27,20 +27,28 @@
             <div class="list-group list-group-flush">
                 <!-- gestione -->
                 <div class="sidebar-section-title">GESTIONE</div>
+                @{
+                    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+                    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+                }
 
-                <a asp-controller="Home" asp-action="Index" class="list-group-item list-group-item-action">
+                <a asp-controller="Home" asp-action="Index"
+                   class="list-group-item list-group-item-action @(currentController == "Home" ? "active" : "")">
                     <i class="bi bi-speedometer2 me-2"></i> Dashboard
                 </a>
 
-                <a asp-controller="Prenotazione" asp-action="Index" class="list-group-item list-group-item-action">
+                <a asp-controller="Prenotazione" asp-action="Index"
+                   class="list-group-item list-group-item-action @(currentController == "Prenotazione" ? "active" : "")">
                     <i class="bi bi-calendar-check me-2"></i> Prenotazioni
                 </a>
 
-                <a asp-controller="Cliente" asp-action="Index" class="list-group-item list-group-item-action">
+                <a asp-controller="Cliente" asp-action="Index"
+                   class="list-group-item list-group-item-action @(currentController == "Cliente" ? "active" : "")">
                     <i class="bi bi-people me-2"></i> Clienti
                 </a>
 
-                <a asp-controller="Camera" asp-action="Index" class="list-group-item list-group-item-action">
+                <a asp-controller="Camera" asp-action="Index"
+                   class="list-group-item list-group-item-action @(currentController == "Camera" ? "active" : "")">
                     <i class="bi bi-door-open me-2"></i> Camere
                 </a>
             </div>
@@ -109,7 +117,6 @@
                     </form>
                 </div>
             </nav>
-
 
             <div class="container-fluid p-4">
                 @RenderBody()

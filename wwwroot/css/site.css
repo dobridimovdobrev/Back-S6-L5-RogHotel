@@ -211,3 +211,7 @@ tr:hover .action-buttons {
 .custom-marginTop {
     margin-top: 6px;
 }
+
+.custom-color {
+    background-color: #f7f7f7;
+}
