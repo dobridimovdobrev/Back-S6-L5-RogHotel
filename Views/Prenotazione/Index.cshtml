@@ -1,6 +1,7 @@
 ﻿@model List<RogHotel.Models.Entity.Prenotazione>
 @{
     ViewData["Title"] = "Gestione Prenotazioni";
+    var canManage = User.IsInRole("Admin") || User.IsInRole("Dipendente");
 }
 
 <div class="container-fluid">
@@ -10,9 +11,13 @@
                 <div>
                     <h2 class="fw-bold mb-1">Gestione Prenotazioni</h2>
                 </div>
-                <button type="button" class="btn btn-primary" id="createPrenotazioneBtn">
-                    <i class="bi bi-plus-lg"></i> Nuova Prenotazione
-                </button>
+
+                @if (canManage)
+                {
+                    <button type="button" class="btn btn-primary" id="createPrenotazioneBtn">
+                        <i class="bi bi-plus-lg"></i> Nuova Prenotazione
+                    </button>
+                }
             </div>
         </div>
     </div>
@@ -63,19 +68,26 @@
                                                 }
                                             </td>
                                             <td class="px-4 py-3 text-end">
-                                                <div class="btn-group">
-                                                    <button type="button" class="btn btn-sm btn-outline-primary edit-btn"
-                                                            data-id="@prenotazione.PrenotazioneId" title="Modifica">
-                                                        <i class="bi bi-pencil"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-sm btn-outline-danger delete-btn"
-                                                            data-id="@prenotazione.PrenotazioneId"
-                                                            data-cliente="@prenotazione.Cliente?.Nome @prenotazione.Cliente?.Cognome"
-                                                            data-camera="@prenotazione.Camera?.Numero"
-                                                            title="Elimina">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </div>
+                                                @if (canManage)
+                                                {
+                                                    <div class="btn-group">
+                                                        <button type="button" class="btn btn-sm btn-outline-primary edit-btn"
+                                                                data-id="@prenotazione.PrenotazioneId" title="Modifica">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-danger delete-btn"
+                                                                data-id="@prenotazione.PrenotazioneId"
+                                                                data-cliente="@prenotazione.Cliente?.Nome @prenotazione.Cliente?.Cognome"
+                                                                data-camera="@prenotazione.Camera?.Numero"
+                                                                title="Elimina">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted small">Solo lettura</span>
+                                                }
                                             </td>
                                         </tr>
                                     }
@@ -89,46 +101,49 @@
     </div>
 </div>
 
-<!-- crea / modifica -->
-<div class="modal fade" id="prenotazioneModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="prenotazioneModalTitle">Prenotazione</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+@if (canManage)
+{
+    <!-- crea / modifica -->
+    <div class="modal fade" id="prenotazioneModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="prenotazioneModalTitle">Prenotazione</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="prenotazioneForm" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="modal-body" id="prenotazioneModalBody">
+                        <!-- qui viene caricato il partial che ho creato per il form -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary py-2 px-3" data-bs-dismiss="modal">Annulla</button>
+                        <button type="submit" class="btn btn-primary py-2 px-3">Salva</button>
+                    </div>
+                </form>
             </div>
-            <form id="prenotazioneForm" method="post">
-                @Html.AntiForgeryToken()
-                <div class="modal-body" id="prenotazioneModalBody">
-                    <!-- qui viene caricato il partial che ho creato per il form -->
+        </div>
+    </div>
+
+    <!-- elimina -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Conferma Eliminazione</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Sei sicuro di voler eliminare la prenotazione di <strong id="deletePrenotazioneInfo"></strong>?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary py-2 px-3" data-bs-dismiss="modal">Annulla</button>
-                    <button type="submit" class="btn btn-primary py-2 px-3">Salva</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Elimina</button>
                 </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- elimina -->
-<div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Conferma Eliminazione</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                Sei sicuro di voler eliminare la prenotazione di <strong id="deletePrenotazioneInfo"></strong>?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Elimina</button>
             </div>
         </div>
     </div>
-</div>
+}
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

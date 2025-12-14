@@ -26,6 +26,6 @@ namespace RogHotel.Models.Dto
         public string ConfirmPassword { get; set; }
 
         [Required(ErrorMessage = "Ruolo obbligatorio")]
-        public string Ruolo { get; set; }
+        public string? Ruolo { get; set; }
     }
 }

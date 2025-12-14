@@ -149,7 +149,7 @@ namespace RogHotel.Controllers
         public async Task<IActionResult> CreateDipendentePartial()
         {
             await LoadRuoliAsync();
-            return PartialView("_FormDipendenteCreate", new CreateDipendenteRequest());
+            return PartialView("_CreateFormDipendente", new CreateDipendenteRequest());
         }
 
         // salva nuovo dipendente ajax
@@ -161,6 +161,12 @@ namespace RogHotel.Controllers
             if (!ModelState.IsValid)
             {
                 return Json(new { success = false, message = "Dati non validi" });
+            }
+
+            var existingByEmail = await _userManager.FindByEmailAsync(request.Email);
+            if (existingByEmail != null)
+            {
+                return Json(new { success = false, message = "Email gia registrata" });
             }
 
             var user = new ApplicationUser
@@ -185,11 +191,12 @@ namespace RogHotel.Controllers
 
             if (!roleResult.Succeeded)
             {
-                return Json(new { success = false, message = "Errore durante l'assegnazione del ruolo" });
+                return Json(new { success = false, message = "Errore durante assegnazione del ruolo" });
             }
 
             return Json(new { success = true, message = "Dipendente creato con successo" });
         }
+
 
         //metodo Get modifica partial form ajax
         [HttpGet]
@@ -217,7 +224,7 @@ namespace RogHotel.Controllers
                 Ruolo = currentRole
             };
 
-            return PartialView("_FormDipendenteEdit", model);
+            return PartialView("_EditFormDipendente", model);
         }
 
         // modifica dipendente ajax
