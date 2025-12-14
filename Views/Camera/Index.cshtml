@@ -10,9 +10,9 @@
                 <div>
                     <h2 class="fw-bold mb-1">Gestione Camere</h2>
                 </div>
-                <a asp-controller="Camera" asp-action="Create" class="btn btn-primary">
+                <button type="button" class="btn btn-primary" id="createCameraBtn">
                     <i class="bi bi-plus-lg"></i> Nuova Camera
-                </a>
+                </button>
             </div>
         </div>
     </div>
@@ -31,7 +31,40 @@
                                     <th class="px-4 py-3 text-end">Azioni</th>
                                 </tr>
                             </thead>
-
+                            <tbody>
+                                @if (Model != null && Model.Any())
+                                {
+                                    @foreach (var camera in Model)
+                                    {
+                                        <tr>
+                                            <td class="px-4 py-3">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-warning bg-opacity-10 rounded d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                                        <i class="bi bi-door-open text-warning"></i>
+                                                    </div>
+                                                    <span class="fw-semibold">@camera.Numero</span>
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-3">@camera.Tipo</td>
+                                            <td class="px-4 py-3">€ @camera.Prezzo.ToString("N2")</td>
+                                            <td class="px-4 py-3 text-end">
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary edit-btn"
+                                                            data-id="@camera.CameraId" title="Modifica">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger delete-btn"
+                                                            data-id="@camera.CameraId"
+                                                            data-numero="@camera.Numero"
+                                                            title="Elimina">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -40,65 +73,246 @@
     </div>
 </div>
 
-@* modal *@
-<tbody>
-    @if (Model != null && Model.Any())
-    {
-        @foreach (var camera in Model)
-        {
-            <tr>
-                <td class="px-4 py-3">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-warning bg-opacity-10 rounded d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                            <i class="bi bi-door-open text-warning"></i>
-                        </div>
-                        <span class="fw-semibold">@camera.Numero</span>
-                    </div>
-                </td>
-                <td class="px-4 py-3">@camera.Tipo</td>
-                <td class="px-4 py-3">€ @camera.Prezzo.ToString("N2")</td>
-                <td class="px-4 py-3 text-end">
-                    <div class="btn-group">
-                        <a asp-controller="Camera" asp-action="Edit" asp-route-id="@camera.CameraId" class="btn btn-sm btn-outline-primary">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal@camera.CameraId">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-
-            <!-- Delete Modal -->
-            <div class="modal fade" id="deleteModal@camera.CameraId" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Conferma Eliminazione</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            Sei sicuro di voler eliminare la camera <strong>@camera.Numero</strong>?
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
-                            <form asp-controller="Camera" asp-action="Delete" asp-route-id="@camera.CameraId" method="post" class="d-inline">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-danger">Elimina</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+<!-- modale camera -->
+<div class="modal fade" id="cameraModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cameraModalTitle">Camera</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-        }
-    }
-</tbody>
+            <form id="cameraForm" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body" id="cameraModalBody">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary py-2 px-3" data-bs-dismiss="modal">Annulla</button>
+                    <button type="submit" class="btn btn-primary py-2 px-3">Salva</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- elimina -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Conferma Eliminazione</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Sei sicuro di voler eliminare la camera <strong id="deleteCameraNumero"></strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Elimina</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
-        $(document).ready(function() {
+        let currentCameraId = null;
+        let isEditMode = false;
+        let cameraModalObj = null;
+        let deleteModalObj = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // datatable
             $('#camereTable').DataTable({
                 order: [[0, 'asc']]
             });
+
+            // bootstrap modal
+            const cameraModalElement = document.getElementById('cameraModal');
+            const deleteModalElement = document.getElementById('deleteModal');
+
+            if (cameraModalElement) {
+                cameraModalObj = new bootstrap.Modal(cameraModalElement);
+            }
+
+            if (deleteModalElement) {
+                deleteModalObj = new bootstrap.Modal(deleteModalElement);
+            }
+
+            addEventListeners();
         });
+
+        function addEventListeners() {
+            // creare
+            const createBtn = document.getElementById('createCameraBtn');
+            if (createBtn) {
+                createBtn.addEventListener('click', async () => {
+                    await openCreateModal();
+                });
+            }
+
+            // modifica
+            const table = document.getElementById('camereTable');
+            if (table) {
+                table.addEventListener('click', async (e) => {
+                    const editBtn = e.target.closest('.edit-btn');
+                    if (editBtn) {
+                        const id = editBtn.getAttribute('data-id');
+                        await openEditModal(id);
+                    }
+                });
+            }
+
+            // elimina
+            if (table) {
+                table.addEventListener('click', (e) => {
+                    const deleteBtn = e.target.closest('.delete-btn');
+                    if (deleteBtn) {
+                        const id = deleteBtn.getAttribute('data-id');
+                        const numero = deleteBtn.getAttribute('data-numero');
+                        openDeleteModal(id, numero);
+                    }
+                });
+            }
+
+            // il submit del form
+            const cameraForm = document.getElementById('cameraForm');
+            if (cameraForm) {
+                cameraForm.addEventListener('submit', async (e) => {
+                    await handleSubmit(e);
+                });
+            }
+
+            // conferma eliminazione
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.addEventListener('click', async () => {
+                    await handleDelete();
+                });
+            }
+        }
+
+        // apertura create modal
+        async function openCreateModal() {
+            isEditMode = false;
+            document.getElementById('cameraModalTitle').textContent = 'Nuova Camera';
+
+            const res = await fetch('@Url.Action("CreatePartial", "Camera")', {
+                method: 'GET'
+            });
+
+            if (!res.ok) {
+                alert('Errore nel caricamento del form');
+                return;
+            }
+
+            const data = await res.text();
+            document.getElementById('cameraModalBody').innerHTML = data;
+
+            rebuildValidator(document.getElementById('cameraForm'));
+
+            cameraModalObj.show();
+        }
+
+        // apertura modifica modal
+        async function openEditModal(id) {
+            isEditMode = true;
+            currentCameraId = id;
+            document.getElementById('cameraModalTitle').textContent = 'Modifica Camera';
+
+            const res = await fetch('@Url.Action("EditPartial", "Camera")/' + id, {
+                method: 'GET'
+            });
+
+            if (!res.ok) {
+                alert('Errore nel caricamento dei dati');
+                return;
+            }
+
+            const data = await res.text();
+            document.getElementById('cameraModalBody').innerHTML = data;
+
+            rebuildValidator(document.getElementById('cameraForm'));
+
+            cameraModalObj.show();
+        }
+
+        // il submit modal
+        async function handleSubmit(e) {
+            e.preventDefault();
+
+            const form = e.target;
+
+            // validazione
+            if (!$(form).valid()) {
+                return;
+            }
+
+            const formData = new FormData(form);
+
+            const url = isEditMode
+                ? '@Url.Action("Edit", "Camera")/' + currentCameraId
+                : '@Url.Action("Create", "Camera")';
+
+            const res = await fetch(url, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!res.ok) {
+                alert('Errore di connessione');
+                return;
+            }
+
+            const result = await res.json();
+
+            if (result.success) {
+                cameraModalObj.hide();
+                location.reload();
+            } else {
+                alert(result.message || 'Errore durante il salvataggio');
+            }
+        }
+
+        // aprire delete modal
+        function openDeleteModal(id, numero) {
+            currentCameraId = id;
+            document.getElementById('deleteCameraNumero').textContent = numero;
+            deleteModalObj.show();
+        }
+
+        // delete
+        async function handleDelete() {
+            const formData = new FormData();
+            formData.append('__RequestVerificationToken',
+                document.querySelector('input[name="__RequestVerificationToken"]').value);
+
+            const res = await fetch('@Url.Action("Delete", "Camera")/' + currentCameraId, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!res.ok) {
+                alert('Errore di connessione');
+                return;
+            }
+
+            const result = await res.json();
+
+            if (result.success) {
+                deleteModalObj.hide();
+                location.reload();
+            } else {
+                alert(result.message || 'Errore durante l\'eliminazione');
+            }
+        }
+
+        function rebuildValidator(form) {
+            if (form) {
+                $(form).removeData("validator");
+                $(form).removeData("unobtrusiveValidation");
+                $.validator.unobtrusive.parse(form);
+            }
+        }
     </script>
 }

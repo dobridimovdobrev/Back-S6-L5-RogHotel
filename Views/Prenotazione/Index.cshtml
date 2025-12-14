@@ -10,9 +10,9 @@
                 <div>
                     <h2 class="fw-bold mb-1">Gestione Prenotazioni</h2>
                 </div>
-                <a asp-controller="Prenotazione" asp-action="Create" class="btn btn-primary">
+                <button type="button" class="btn btn-primary" id="createPrenotazioneBtn">
                     <i class="bi bi-plus-lg"></i> Nuova Prenotazione
-                </a>
+                </button>
             </div>
         </div>
     </div>
@@ -27,12 +27,60 @@
                                 <tr>
                                     <th class="px-4 py-3">Cliente</th>
                                     <th class="px-4 py-3">Camera</th>
+                                    <th class="px-4 py-3">Numero</th>
                                     <th class="px-4 py-3">Check-in</th>
                                     <th class="px-4 py-3">Check-out</th>
                                     <th class="px-4 py-3">Stato</th>
                                     <th class="px-4 py-3 text-end">Azioni</th>
                                 </tr>
                             </thead>
+                            <tbody>
+                                @if (Model != null && Model.Any())
+                                {
+                                    @foreach (var prenotazione in Model)
+                                    {
+                                        <tr>
+                                            <td class="px-4 py-3">
+                                                <div class="fw-semibold">@prenotazione.Cliente?.Nome @prenotazione.Cliente?.Cognome</div>
+                                                <div class="text-muted small">@prenotazione.Cliente?.Email</div>
+                                            </td>
+                                            <td class="px-4 py-3">@prenotazione.Camera?.Tipo</td>
+                                            <td class="px-4 py-3">@prenotazione.Camera?.Numero</td>
+                                            <td class="px-4 py-3">@prenotazione.DataInizio.ToString("dd/MM/yyyy")</td>
+                                            <td class="px-4 py-3">@prenotazione.DataFine.ToString("dd/MM/yyyy")</td>
+                                            <td class="px-4 py-3">
+                                                @if (prenotazione.Stato == "Confermata")
+                                                {
+                                                    <span class="badge bg-success">@prenotazione.Stato</span>
+                                                }
+                                                else if (prenotazione.Stato == "Annullata")
+                                                {
+                                                    <span class="badge bg-danger">@prenotazione.Stato</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-info">@prenotazione.Stato</span>
+                                                }
+                                            </td>
+                                            <td class="px-4 py-3 text-end">
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary edit-btn"
+                                                            data-id="@prenotazione.PrenotazioneId" title="Modifica">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger delete-btn"
+                                                            data-id="@prenotazione.PrenotazioneId"
+                                                            data-cliente="@prenotazione.Cliente?.Nome @prenotazione.Cliente?.Cognome"
+                                                            data-camera="@prenotazione.Camera?.Numero"
+                                                            title="Elimina">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -40,73 +88,254 @@
         </div>
     </div>
 </div>
-@* modal *@
-<tbody>
-    @if (Model != null && Model.Any())
-    {
-        @foreach (var prenotazione in Model)
-        {
-            <tr>
-                <td class="px-4 py-3">@prenotazione.Cliente?.Nome @prenotazione.Cliente?.Cognome</td>
-                <td class="px-4 py-3">@prenotazione.Camera?.Numero</td>
-                <td class="px-4 py-3">@prenotazione.DataInizio.ToString("dd/MM/yyyy")</td>
-                <td class="px-4 py-3">@prenotazione.DataFine.ToString("dd/MM/yyyy")</td>
-                <td class="px-4 py-3">
-                    @if (prenotazione.Stato == "Confermata")
-                    {
-                        <span class="badge bg-success">@prenotazione.Stato</span>
-                    }
-                    else if (prenotazione.Stato == "Annullata")
-                    {
-                        <span class="badge bg-danger">@prenotazione.Stato</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-info">@prenotazione.Stato</span>
-                    }
-                </td>
-                <td class="px-4 py-3 text-end">
-                    <div class="btn-group">
-                        <a asp-controller="Prenotazione" asp-action="Edit" asp-route-id="@prenotazione.PrenotazioneId" class="btn btn-sm btn-outline-primary">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal@prenotazione.PrenotazioneId">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
 
-            <!-- Delete Modal -->
-            <div class="modal fade" id="deleteModal@prenotazione.PrenotazioneId" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Conferma Eliminazione</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            Sei sicuro di voler eliminare questa prenotazione?
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
-                            <form asp-controller="Prenotazione" asp-action="Delete" asp-route-id="@prenotazione.PrenotazioneId" method="post" class="d-inline">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-danger">Elimina</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+<!-- crea / modifica -->
+<div class="modal fade" id="prenotazioneModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="prenotazioneModalTitle">Prenotazione</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-        }
-    }
-</tbody>
+            <form id="prenotazioneForm" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body" id="prenotazioneModalBody">
+                    <!-- qui viene caricato il partial che ho creato per il form -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary py-2 px-3" data-bs-dismiss="modal">Annulla</button>
+                    <button type="submit" class="btn btn-primary py-2 px-3">Salva</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- elimina -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Conferma Eliminazione</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Sei sicuro di voler eliminare la prenotazione di <strong id="deletePrenotazioneInfo"></strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Elimina</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
-        $(document).ready(function() {
+        let currentPrenotazioneId = null;
+        let isEditMode = false;
+        let prenotazioneModalObj = null;
+        let deleteModalObj = null;
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // data tables
             $('#prenotazioniTable').DataTable({
                 order: [[2, 'desc']]
             });
+
+            // bootstrap modals
+            const prenotazioneModalElement = document.getElementById('prenotazioneModal');
+            const deleteModalElement = document.getElementById('deleteModal');
+
+            if (prenotazioneModalElement) {
+                prenotazioneModalObj = new bootstrap.Modal(prenotazioneModalElement);
+            }
+
+            if (deleteModalElement) {
+                deleteModalObj = new bootstrap.Modal(deleteModalElement);
+            }
+
+
+            addEventListeners();
         });
+
+        function addEventListeners() {
+            // create
+            const createBtn = document.getElementById('createPrenotazioneBtn');
+            if (createBtn) {
+                createBtn.addEventListener('click', async () => {
+                    await openCreateModal();
+                });
+            }
+
+            // modifica
+            const table = document.getElementById('prenotazioniTable');
+            if (table) {
+                table.addEventListener('click', async (e) => {
+                    const editBtn = e.target.closest('.edit-btn');
+                    if (editBtn) {
+                        const id = editBtn.getAttribute('data-id');
+                        await openEditModal(id);
+                    }
+                });
+            }
+
+            // elimina
+            if (table) {
+                table.addEventListener('click', (e) => {
+                    const deleteBtn = e.target.closest('.delete-btn');
+                    if (deleteBtn) {
+                        const id = deleteBtn.getAttribute('data-id');
+                        const cliente = deleteBtn.getAttribute('data-cliente');
+                        const camera = deleteBtn.getAttribute('data-camera');
+                        openDeleteModal(id, cliente, camera);
+                    }
+                });
+            }
+
+            // form che gestice il submit
+            const prenotazioneForm = document.getElementById('prenotazioneForm');
+            if (prenotazioneForm) {
+                prenotazioneForm.addEventListener('submit', async (e) => {
+                    await handleSubmit(e);
+                });
+            }
+
+            // conferma eliminazione
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.addEventListener('click', async () => {
+                    await handleDelete();
+                });
+            }
+        }
+
+        // apri modal create
+        async function openCreateModal() {
+            isEditMode = false;
+            document.getElementById('prenotazioneModalTitle').textContent = 'Nuova Prenotazione';
+
+            const res = await fetch('@Url.Action("CreatePartial", "Prenotazione")', {
+                method: 'GET'
+            });
+
+            if (!res.ok) {
+                alert('Errore nel caricamento del form');
+                return;
+            }
+
+            const data = await res.text();
+            document.getElementById('prenotazioneModalBody').innerHTML = data;
+
+
+            rebuildValidator(document.getElementById('prenotazioneForm'));
+
+            prenotazioneModalObj.show();
+        }
+
+        //apri modal edit/modifica
+        async function openEditModal(id) {
+            isEditMode = true;
+            currentPrenotazioneId = id;
+            document.getElementById('prenotazioneModalTitle').textContent = 'Modifica Prenotazione';
+
+            const res = await fetch('@Url.Action("EditPartial", "Prenotazione")/' + id, {
+                method: 'GET'
+            });
+
+            if (!res.ok) {
+                alert('Errore nel caricamento dei dati');
+                return;
+            }
+
+            const data = await res.text();
+            document.getElementById('prenotazioneModalBody').innerHTML = data;
+
+            // Riattiva validazione
+            rebuildValidator(document.getElementById('prenotazioneForm'));
+
+            prenotazioneModalObj.show();
+        }
+
+        // submit per create e edit
+        async function handleSubmit(e) {
+            e.preventDefault();
+
+            const form = e.target;
+
+            // Validazione
+            if (!$(form).valid()) {
+                return;
+            }
+
+            const formData = new FormData(form);
+
+            const url = isEditMode
+                ? '@Url.Action("Edit", "Prenotazione")/' + currentPrenotazioneId
+                : '@Url.Action("Create", "Prenotazione")';
+
+            const res = await fetch(url, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!res.ok) {
+                alert('Errore di connessione');
+                return;
+            }
+
+            const result = await res.json();
+
+            if (result.success) {
+                prenotazioneModalObj.hide();
+                location.reload();
+            } else {
+                alert(result.message || 'Errore salvataggio');
+            }
+        }
+
+        // apri modal  delete
+        function openDeleteModal(id, cliente, camera) {
+            currentPrenotazioneId = id;
+            document.getElementById('deletePrenotazioneInfo').textContent = `${cliente} - Camera ${camera}`;
+            deleteModalObj.show();
+        }
+
+        // elimina
+        async function handleDelete() {
+            const formData = new FormData();
+            formData.append('__RequestVerificationToken',
+                document.querySelector('input[name="__RequestVerificationToken"]').value);
+
+            const res = await fetch('@Url.Action("Delete", "Prenotazione")/' + currentPrenotazioneId, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!res.ok) {
+                alert('Errore di connessione');
+                return;
+            }
+
+            const result = await res.json();
+
+            if (result.success) {
+                deleteModalObj.hide();
+                location.reload();
+            } else {
+                alert(result.message || 'Errore eliminazione');
+            }
+        }
+
+
+        function rebuildValidator(form) {
+            if (form) {
+                $(form).removeData("validator");
+                $(form).removeData("unobtrusiveValidation");
+                $.validator.unobtrusive.parse(form);
+            }
+        }
     </script>
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using RogHotel.Models.Entity;
 using RogHotel.Services;
 
@@ -15,65 +16,107 @@ namespace RogHotel.Controllers
             _cameraService = cameraService;
         }
 
+        private void LoadDropdowns()
+        {
+            ViewBag.TipiCamera = new SelectList(new[]
+            {
+                "Singola",
+                "Doppia",
+                "Suite",
+                "Deluxe",
+                "Uncle Rog Premium"
+            });
+        }
+
+        // lista camere
         public async Task<IActionResult> Index()
         {
             var camere = await _cameraService.GetCamereAsync();
             return View(camere);
         }
 
-        public IActionResult Create()
+        // metodo Get form 
+        [HttpGet]
+        public IActionResult CreatePartial()
         {
-            return View();
+            LoadDropdowns();
+            var camera = new Camera();
+            return PartialView("_FormCamera", camera);
         }
 
+        // salva camera form ajax
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Camera camera)
         {
             if (!ModelState.IsValid)
-                return View(camera);
+            {
+                return Json(new { success = false, message = "Dati non validi" });
+            }
 
             var result = await _cameraService.CreateCameraAsync(camera);
 
             if (result)
-                return RedirectToAction(nameof(Index));
+            {
+                return Json(new { success = true, message = "Camera creata con successo" });
+            }
 
-            return View(camera);
+            return Json(new { success = false, message = "Errore durante la creazione" });
         }
 
-        public async Task<IActionResult> Edit(Guid id)
+        // metodo Get modifica form
+        [HttpGet]
+        public async Task<IActionResult> EditPartial(Guid id)
         {
             var camera = await _cameraService.GetCameraAsync(id);
-            if (camera == null)
-                return NotFound();
 
-            return View(camera);
+            if (camera == null)
+            {
+                return NotFound();
+            }
+
+            LoadDropdowns();
+            return PartialView("_FormCamera", camera);
         }
 
+        // modofica camera ajax
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, Camera camera)
         {
             if (id != camera.CameraId)
-                return NotFound();
+            {
+                return Json(new { success = false, message = "ID non corrispondente" });
+            }
 
             if (!ModelState.IsValid)
-                return View(camera);
+            {
+                return Json(new { success = false, message = "Dati non validi" });
+            }
 
             var result = await _cameraService.UpdateCameraAsync(camera);
 
             if (result)
-                return RedirectToAction(nameof(Index));
+            {
+                return Json(new { success = true, message = "Camera aggiornata con successo" });
+            }
 
-            return View(camera);
+            return Json(new { success = false, message = "Errore durante l'aggiornamento" });
         }
 
+        // elimina camera ajax
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id)
         {
-            await _cameraService.DeleteCameraAsync(id);
-            return RedirectToAction(nameof(Index));
+            var result = await _cameraService.DeleteCameraAsync(id);
+
+            if (result)
+            {
+                return Json(new { success = true, message = "Camera eliminata con successo" });
+            }
+
+            return Json(new { success = false, message = "Errore durante l'eliminazione" });
         }
     }
 }

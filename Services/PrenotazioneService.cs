@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RogHotel.Models;
 using RogHotel.Models.Entity;
 
 namespace RogHotel.Services
@@ -87,6 +88,53 @@ namespace RogHotel.Services
                 return false;
             }
         }
+        // statistiche
+        public async Task<DashboardViewModel> GetDashboardStatsAsync()
+        {
+            var oggi = DateTime.Today;
+            var domani = oggi.AddDays(1);
+
+            var stats = new DashboardViewModel
+            {
+                // arrivi 
+                ArriviOggi = await _context.Prenotazioni
+                    .Where(p => p.DataInizio.Date == oggi && p.Stato == "Confermata")
+                    .CountAsync(),
+
+                // partenze oggi 
+                PartenzeOggi = await _context.Prenotazioni
+                    .Where(p => p.DataFine.Date == oggi && p.Stato == "Confermata")
+                    .CountAsync(),
+
+                // camere totali
+                CamereTotali = await _context.Camere.CountAsync(),
+
+                // camere occupate
+                CamereDisponibili = await _context.Camere.CountAsync() -
+                    await _context.Prenotazioni
+                        .Where(p => oggi >= p.DataInizio.Date &&
+                                   oggi < p.DataFine.Date &&
+                                   p.Stato == "Confermata")
+                        .Select(p => p.CameraId)
+                        .Distinct()
+                        .CountAsync(),
+
+                // totale clienti
+                TotaleClienti = await _context.Clienti.CountAsync(),
+
+                // prossimi 6 arrivi 
+                ProssimiArrivi = await _context.Prenotazioni
+                    .Include(p => p.Cliente)
+                    .Include(p => p.Camera)
+                    .Where(p => p.DataInizio.Date >= oggi && p.Stato == "Confermata")
+                    .OrderBy(p => p.DataInizio)
+                    .Take(6)
+                    .ToListAsync()
+            };
+
+            return stats;
+        }
+
         // disonibiulita prenotazioni
         private async Task<bool> DisponibilitaPrenotazioniAsync(Guid cameraId, DateTime dataInizio, DateTime dataFine)
         {

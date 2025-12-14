@@ -11,13 +11,13 @@ namespace RogHotel.Models.Entity
         public Guid ClienteId { get; set; }
 
         [ForeignKey("ClienteId")]
-        public Cliente Cliente { get; set; }
+        public Cliente? Cliente { get; set; }
 
         [Required]
         public Guid CameraId { get; set; }
 
         [ForeignKey("CameraId")]
-        public Camera Camera { get; set; }
+        public Camera? Camera { get; set; }
 
         [Required(ErrorMessage = "Data inizio obbligatoria")]
         public DateTime DataInizio { get; set; }
@@ -27,7 +27,7 @@ namespace RogHotel.Models.Entity
 
         [Required(ErrorMessage = "Stato obbligatorio")]
         [StringLength(20)]
-        public string Stato { get; set; }
+        public string Stato { get; set; } = string.Empty;
 
 
     }

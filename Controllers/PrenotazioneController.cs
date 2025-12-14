@@ -23,24 +23,36 @@ namespace RogHotel.Controllers
             _cameraService = cameraService;
         }
 
-        public async Task<IActionResult> Index()
+        private async Task LoadDropdownsAsync()
         {
-            var prenotazioni = await _prenotazioneService.GetPrenotazioniAsync();
-            return View(prenotazioni);
-        }
-
-        [Authorize(Roles = "Admin,Dipendente")]
-        public async Task<IActionResult> Create()
-        {
-
             var clienti = await _clienteService.GetClientiAsync();
             var camere = await _cameraService.GetCamereAsync();
 
             ViewBag.Clienti = new SelectList(clienti, "ClienteId", "Nome");
             ViewBag.Camere = new SelectList(camere, "CameraId", "Numero");
             ViewBag.Stati = new SelectList(new[] { "Confermata", "Annullata", "Completata" });
+        }
 
-            return View();
+        public async Task<IActionResult> Index()
+        {
+            var prenotazioni = await _prenotazioneService.GetPrenotazioniAsync();
+            return View(prenotazioni);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin,Dipendente")]
+        public async Task<IActionResult> CreatePartial()
+        {
+            await LoadDropdownsAsync();
+            var prenotazione = new Prenotazione
+            {
+                // configuro di default giorno e ora per il check in
+                DataInizio = DateTime.Today.AddHours(14),
+
+                //voglio settare di defaul 1 giorno e orario per check out
+                DataFine = DateTime.Today.AddDays(1).AddHours(10)
+            };
+            return PartialView("_FormPrenotazione", prenotazione);
         }
 
         [HttpPost]
@@ -50,51 +62,32 @@ namespace RogHotel.Controllers
         {
             if (!ModelState.IsValid)
             {
-
-                var clienti = await _clienteService.GetClientiAsync();
-                var camere = await _cameraService.GetCamereAsync();
-
-                ViewBag.Clienti = new SelectList(clienti, "ClienteId", "Nome");
-                ViewBag.Camere = new SelectList(camere, "CameraId", "Numero");
-                ViewBag.Stati = new SelectList(new[] { "Confermata", "Annullata", "Completata" });
-
-                return View(prenotazione);
+                return Json(new { success = false, message = "Dati non validi" });
             }
 
             var result = await _prenotazioneService.CreatePrenotazioneAsync(prenotazione);
 
             if (result)
-                return RedirectToAction(nameof(Index));
+            {
+                return Json(new { success = true, message = "Prenotazione creata con successo" });
+            }
 
-            ModelState.AddModelError(string.Empty, "Camera non disponibile");
-
-
-            var clienti2 = await _clienteService.GetClientiAsync();
-            var camere2 = await _cameraService.GetCamereAsync();
-
-            ViewBag.Clienti = new SelectList(clienti2, "ClienteId", "Nome");
-            ViewBag.Camere = new SelectList(camere2, "CameraId", "Numero");
-            ViewBag.Stati = new SelectList(new[] { "Confermata", "Annullata", "Completata" });
-
-            return View(prenotazione);
+            return Json(new { success = false, message = "Camera non disponibile" });
         }
 
+        [HttpGet]
         [Authorize(Roles = "Admin,Dipendente")]
-        public async Task<IActionResult> Edit(Guid id)
+        public async Task<IActionResult> EditPartial(Guid id)
         {
             var prenotazione = await _prenotazioneService.GetPrenotazioneAsync(id);
+
             if (prenotazione == null)
+            {
                 return NotFound();
+            }
 
-
-            var clienti = await _clienteService.GetClientiAsync();
-            var camere = await _cameraService.GetCamereAsync();
-
-            ViewBag.Clienti = new SelectList(clienti, "ClienteId", "Nome");
-            ViewBag.Camere = new SelectList(camere, "CameraId", "Numero");
-            ViewBag.Stati = new SelectList(new[] { "Confermata", "Annullata", "Completata" });
-
-            return View(prenotazione);
+            await LoadDropdownsAsync();
+            return PartialView("_FormPrenotazione", prenotazione);
         }
 
         [HttpPost]
@@ -103,37 +96,23 @@ namespace RogHotel.Controllers
         public async Task<IActionResult> Edit(Guid id, Prenotazione prenotazione)
         {
             if (id != prenotazione.PrenotazioneId)
-                return NotFound();
+            {
+                return Json(new { success = false, message = "ID non corrispondente" });
+            }
 
             if (!ModelState.IsValid)
             {
-
-                var clienti = await _clienteService.GetClientiAsync();
-                var camere = await _cameraService.GetCamereAsync();
-
-                ViewBag.Clienti = new SelectList(clienti, "ClienteId", "Nome");
-                ViewBag.Camere = new SelectList(camere, "CameraId", "Numero");
-                ViewBag.Stati = new SelectList(new[] { "Confermata", "Annullata", "Completata" });
-
-                return View(prenotazione);
+                return Json(new { success = false, message = "Dati non validi" });
             }
 
             var result = await _prenotazioneService.UpdatePrenotazioneAsync(prenotazione);
 
             if (result)
-                return RedirectToAction(nameof(Index));
+            {
+                return Json(new { success = true, message = "Prenotazione aggiornata con successo" });
+            }
 
-            ModelState.AddModelError(string.Empty, "Errore");
-
-
-            var clienti2 = await _clienteService.GetClientiAsync();
-            var camere2 = await _cameraService.GetCamereAsync();
-
-            ViewBag.Clienti = new SelectList(clienti2, "ClienteId", "Nome");
-            ViewBag.Camere = new SelectList(camere2, "CameraId", "Numero");
-            ViewBag.Stati = new SelectList(new[] { "Confermata", "Annullata", "Completata" });
-
-            return View(prenotazione);
+            return Json(new { success = false, message = "Errore durante l'aggiornamento" });
         }
 
         [HttpPost]
@@ -141,8 +120,14 @@ namespace RogHotel.Controllers
         [Authorize(Roles = "Admin,Dipendente")]
         public async Task<IActionResult> Delete(Guid id)
         {
-            await _prenotazioneService.DeletePrenotazioneAsync(id);
-            return RedirectToAction(nameof(Index));
+            var result = await _prenotazioneService.DeletePrenotazioneAsync(id);
+
+            if (result)
+            {
+                return Json(new { success = true, message = "Prenotazione eliminata con successo" });
+            }
+
+            return Json(new { success = false, message = "Errore durante l'eliminazione" });
         }
     }
 }

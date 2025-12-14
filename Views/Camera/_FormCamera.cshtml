@@ -1,0 +1,24 @@
+﻿@model RogHotel.Models.Entity.Camera
+
+<input asp-for="CameraId" type="hidden" />
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label asp-for="Numero" class="form-label">Numero Camera</label>
+        <input asp-for="Numero" type="text" class="form-control" placeholder="es: 101" />
+        <span asp-validation-for="Numero" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label asp-for="Tipo" class="form-label">Tipo Camera</label>
+        <select asp-for="Tipo" class="form-select" asp-items="ViewBag.TipiCamera">
+            <option value="">Seleziona tipo...</option>
+        </select>
+        <span asp-validation-for="Tipo" class="text-danger small"></span>
+    </div>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Prezzo" class="form-label">Prezzo per Notte (€)</label>
+    <input asp-for="Prezzo" type="number" step="0.01" min="0" class="form-control" placeholder="es: 89.99" />
+    <span asp-validation-for="Prezzo" class="text-danger small"></span>
+</div>

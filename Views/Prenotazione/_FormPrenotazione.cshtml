@@ -1,0 +1,45 @@
+﻿@model RogHotel.Models.Entity.Prenotazione
+
+<input asp-for="PrenotazioneId" type="hidden" />
+
+@* cliente *@
+<div class="mb-3">
+    <label asp-for="ClienteId" class="form-label">Cliente</label>
+    <select asp-for="ClienteId" class="form-select" asp-items="ViewBag.Clienti">
+        <option value="">Seleziona cliente...</option>
+    </select>
+    <span asp-validation-for="ClienteId" class="text-danger small"></span>
+</div>
+
+@* camera *@
+<div class="mb-3">
+    <label asp-for="CameraId" class="form-label">Camera</label>
+    <select asp-for="CameraId" class="form-select" asp-items="ViewBag.Camere">
+        <option value="">Seleziona camera...</option>
+    </select>
+    <span asp-validation-for="CameraId" class="text-danger small"></span>
+</div>
+
+@* data inizioa *@
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label asp-for="DataInizio" class="form-label">Check-in</label>
+        <input asp-for="DataInizio" type="datetime-local" value="@Model.DataInizio.ToString("yyyy-MM-ddTHH:mm")" class="form-control" />
+        <span asp-validation-for="DataInizio" class="text-danger small"></span>
+    </div>
+    @* data fine *@
+    <div class="col-md-6 mb-3">
+        <label asp-for="DataFine" class="form-label">Check-out</label>
+        <input asp-for="DataFine" type="datetime-local" value="@Model.DataFine.ToString("yyyy-MM-ddTHH:mm")" class="form-control" />
+        <span asp-validation-for="DataFine" class="text-danger small"></span>
+    </div>
+</div>
+
+@* stato *@
+<div class="mb-3">
+    <label asp-for="Stato" class="form-label">Stato</label>
+    <select asp-for="Stato" class="form-select" asp-items="ViewBag.Stati">
+        <option value="">Seleziona stato...</option>
+    </select>
+    <span asp-validation-for="Stato" class="text-danger small"></span>
+</div>

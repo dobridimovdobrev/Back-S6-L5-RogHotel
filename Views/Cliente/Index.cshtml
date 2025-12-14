@@ -154,21 +154,28 @@
             }
 
             // modifica
-            document.querySelectorAll('.edit-btn').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    const id = e.currentTarget.getAttribute('data-id');
-                    await openEditModal(id);
+            const table = document.getElementById('clientiTable');
+            if (table) {
+                table.addEventListener('click', async (e) => {
+                    const editBtn = e.target.closest('.edit-btn');
+                    if (editBtn) {
+                        const id = editBtn.getAttribute('data-id');
+                        await openEditModal(id);
+                    }
                 });
-            });
+            }
 
             // elimina
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = e.currentTarget.getAttribute('data-id');
-                    const name = e.currentTarget.getAttribute('data-name');
-                    openDeleteModal(id, name);
+            if (table) {
+                table.addEventListener('click', (e) => {
+                    const deleteBtn = e.target.closest('.delete-btn');
+                    if (deleteBtn) {
+                        const id = deleteBtn.getAttribute('data-id');
+                        const name = deleteBtn.getAttribute('data-name');
+                        openDeleteModal(id, name);
+                    }
                 });
-            });
+            }
 
             // il submit del form
             const clienteForm = document.getElementById('clienteForm');
@@ -301,7 +308,6 @@
                 alert(result.message || 'Errore durante l\'eliminazione');
             }
         }
-
 
         function rebuildValidator(form) {
             if (form) {
