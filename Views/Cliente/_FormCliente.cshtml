@@ -1,0 +1,29 @@
+﻿@model RogHotel.Models.Entity.Cliente
+
+@* importante mettere questo input per Guid, dimentico sempre questa parte esce sempre alert al edit del form *@
+<input asp-for="ClienteId" type="hidden" />
+
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <label asp-for="Nome" class="form-label">Nome</label>
+        <input asp-for="Nome" class="form-control" />
+        <span asp-validation-for="Nome" class="text-danger small"></span>
+    </div>
+    <div class="col-md-6 mb-3">
+        <label asp-for="Cognome" class="form-label">Cognome</label>
+        <input asp-for="Cognome" class="form-control" />
+        <span asp-validation-for="Cognome" class="text-danger small"></span>
+    </div>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Email" class="form-label">Email</label>
+    <input asp-for="Email" type="email" class="form-control" />
+    <span asp-validation-for="Email" class="text-danger small"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Telefono" class="form-label">Telefono</label>
+    <input asp-for="Telefono" class="form-control" />
+    <span asp-validation-for="Telefono" class="text-danger small"></span>
+</div>

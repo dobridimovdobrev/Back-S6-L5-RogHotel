@@ -15,65 +15,93 @@ namespace RogHotel.Controllers
             _clienteService = clienteService;
         }
 
+        // lista clienti
         public async Task<IActionResult> Index()
         {
             var clienti = await _clienteService.GetClientiAsync();
             return View(clienti);
         }
 
-        public IActionResult Create()
+        // metodo Get create form partial ajax
+        [HttpGet]
+        public IActionResult CreatePartial()
         {
-            return View();
+            var cliente = new Cliente();
+            return PartialView("_FormCliente", cliente);
         }
 
+        // salva nuovo cliente ajax
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Cliente cliente)
         {
             if (!ModelState.IsValid)
-                return View(cliente);
+            {
+                return Json(new { success = false, message = "Dati non validi" });
+            }
 
             var result = await _clienteService.CreateClienteAsync(cliente);
 
             if (result)
-                return RedirectToAction(nameof(Index));
+            {
+                return Json(new { success = true, message = "Cliente creato con successo" });
+            }
 
-            return View(cliente);
+            return Json(new { success = false, message = "Errore durante la creazione" });
         }
 
-        public async Task<IActionResult> Edit(Guid id)
+        //metodo Get modifica partial form ajax
+        [HttpGet]
+        public async Task<IActionResult> EditPartial(Guid id)
         {
             var cliente = await _clienteService.GetClienteAsync(id);
-            if (cliente == null)
-                return NotFound();
 
-            return View(cliente);
+            if (cliente == null)
+            {
+                return NotFound();
+            }
+
+            return PartialView("_FormCliente", cliente);
         }
 
+        // modifica cliente ajax
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, Cliente cliente)
         {
             if (id != cliente.ClienteId)
-                return NotFound();
+            {
+                return Json(new { success = false, message = "ID non corrispondente" });
+            }
 
             if (!ModelState.IsValid)
-                return View(cliente);
+            {
+                return Json(new { success = false, message = "Dati non validi" });
+            }
 
             var result = await _clienteService.UpdateClienteAsync(cliente);
 
             if (result)
-                return RedirectToAction(nameof(Index));
+            {
+                return Json(new { success = true, message = "Cliente aggiornato con successo" });
+            }
 
-            return View(cliente);
+            return Json(new { success = false, message = "Errore durante l'aggiornamento" });
         }
 
+        // elimina cliente ajax
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(Guid id)
         {
-            await _clienteService.DeleteClienteAsync(id);
-            return RedirectToAction(nameof(Index));
+            var result = await _clienteService.DeleteClienteAsync(id);
+
+            if (result)
+            {
+                return Json(new { success = true, message = "Cliente eliminato con successo" });
+            }
+
+            return Json(new { success = false, message = "Errore durante l'eliminazione" });
         }
     }
 }

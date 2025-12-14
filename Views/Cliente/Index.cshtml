@@ -4,21 +4,19 @@
 }
 
 <div class="container-fluid">
-    <!-- Header -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h2 class="fw-bold mb-1">Gestione Clienti</h2>
                 </div>
-                <a asp-controller="Cliente" asp-action="Create" class="btn btn-primary">
+                <button type="button" class="btn btn-primary" id="createClienteBtn">
                     <i class="bi bi-plus-lg"></i> Nuovo Cliente
-                </a>
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Table -->
     <div class="row">
         <div class="col-12">
             <div class="card border-0 shadow-sm">
@@ -28,14 +26,47 @@
                             <thead class="bg-light">
                                 <tr>
                                     <th class="px-4 py-3">Cliente</th>
-                                    <th class="px-4 py-3">Nome</th>
-                                    <th class="px-4 py-3">Cognome</th>
                                     <th class="px-4 py-3">Email</th>
                                     <th class="px-4 py-3">Telefono</th>
                                     <th class="px-4 py-3 text-end">Azioni</th>
                                 </tr>
                             </thead>
-
+                            <tbody>
+                                @if (Model != null && Model.Any())
+                                {
+                                    @foreach (var cliente in Model)
+                                    {
+                                        <tr>
+                                            <td class="px-4 py-3">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                                        <span class="text-primary fw-bold">@cliente.Nome.Substring(0, 1)@cliente.Cognome.Substring(0, 1)</span>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-semibold">@cliente.Nome @cliente.Cognome</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-3">@cliente.Email</td>
+                                            <td class="px-4 py-3">@cliente.Telefono</td>
+                                            <td class="px-4 py-3 text-end">
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary edit-btn"
+                                                            data-id="@cliente.ClienteId" title="Modifica">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger delete-btn"
+                                                            data-id="@cliente.ClienteId"
+                                                            data-name="@cliente.Nome @cliente.Cognome"
+                                                            title="Elimina">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -43,71 +74,241 @@
         </div>
     </div>
 </div>
-@* modal *@
-<tbody>
-    @if (Model != null && Model.Any())
-    {
-        @foreach (var cliente in Model)
-        {
-            <tr>
-                <td class="px-4 py-3">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                            <span class="text-primary fw-bold">@cliente.Nome.Substring(0, 1)@cliente.Cognome.Substring(0, 1)</span>
-                        </div>
-                        <div>
-                            <div class="fw-semibold">@cliente.Nome @cliente.Cognome</div>
-                        </div>
-                    </div>
-                </td>
-                <td class="px-4 py-3">@cliente.Email</td>
-                <td class="px-4 py-3">@cliente.Telefono</td>
-                <td class="px-4 py-3 text-end">
-                    <div class="btn-group" role="group">
-                        <a asp-controller="Cliente" asp-action="Edit" asp-route-id="@cliente.ClienteId"
-                           class="btn btn-sm btn-outline-primary" title="Modifica">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        <button type="button" class="btn btn-sm btn-outline-danger"
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteModal@cliente.ClienteId"
-                                title="Elimina">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
 
-            <!-- Delete Modal -->
-            <div class="modal fade" id="deleteModal@cliente.ClienteId" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Conferma Eliminazione</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                            Sei sicuro di voler eliminare <strong>@cliente.Nome @cliente.Cognome</strong>?
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
-                            <form asp-controller="Cliente" asp-action="Delete" asp-route-id="@cliente.ClienteId" method="post" class="d-inline">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-danger">Elimina</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+<!-- modale cliente -->
+<div class="modal fade" id="clienteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="clienteModalTitle">Cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-        }
-    }
-</tbody>
+            <form id="clienteForm" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body" id="clienteModalBody">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary py-2 px-3" data-bs-dismiss="modal">Annulla</button>
+                    <button type="submit" class="btn btn-primary py-2 px-3">Salva</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- elimina -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Conferma Eliminazione</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Sei sicuro di voler eliminare <strong id="deleteClienteName"></strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Elimina</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
-        $(document).ready(function() {
+        let currentClienteId = null;
+        let isEditMode = false;
+        let clienteModalObj = null;
+        let deleteModalObj = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // datatable
             $('#clientiTable').DataTable({
                 order: [[0, 'asc']]
             });
+
+            // bootstrp modal
+            const clienteModalElement = document.getElementById('clienteModal');
+            const deleteModalElement = document.getElementById('deleteModal');
+
+            if (clienteModalElement) {
+                clienteModalObj = new bootstrap.Modal(clienteModalElement);
+            }
+
+            if (deleteModalElement) {
+                deleteModalObj = new bootstrap.Modal(deleteModalElement);
+            }
+
+            addEventListeners();
         });
+
+        function addEventListeners() {
+            // creare
+            const createBtn = document.getElementById('createClienteBtn');
+            if (createBtn) {
+                createBtn.addEventListener('click', async () => {
+                    await openCreateModal();
+                });
+            }
+
+            // modifica
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = e.currentTarget.getAttribute('data-id');
+                    await openEditModal(id);
+                });
+            });
+
+            // elimina
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.currentTarget.getAttribute('data-id');
+                    const name = e.currentTarget.getAttribute('data-name');
+                    openDeleteModal(id, name);
+                });
+            });
+
+            // il submit del form
+            const clienteForm = document.getElementById('clienteForm');
+            if (clienteForm) {
+                clienteForm.addEventListener('submit', async (e) => {
+                    await handleSubmit(e);
+                });
+            }
+
+            // conferma eliminazione
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.addEventListener('click', async () => {
+                    await handleDelete();
+                });
+            }
+        }
+
+        // apertura create modal
+        async function openCreateModal() {
+            isEditMode = false;
+            document.getElementById('clienteModalTitle').textContent = 'Nuovo Cliente';
+
+            const res = await fetch('@Url.Action("CreatePartial", "Cliente")', {
+                method: 'GET'
+            });
+
+            if (!res.ok) {
+                alert('Errore nel caricamento del form');
+                return;
+            }
+
+            const data = await res.text();
+            document.getElementById('clienteModalBody').innerHTML = data;
+
+            rebuildValidator(document.getElementById('clienteForm'));
+
+            clienteModalObj.show();
+        }
+
+        // apertura modifica modal
+        async function openEditModal(id) {
+            isEditMode = true;
+            currentClienteId = id;
+            document.getElementById('clienteModalTitle').textContent = 'Modifica Cliente';
+
+            const res = await fetch('@Url.Action("EditPartial", "Cliente")/' + id, {
+                method: 'GET'
+            });
+
+            if (!res.ok) {
+                alert('Errore nel caricamento dei dati');
+                return;
+            }
+
+            const data = await res.text();
+            document.getElementById('clienteModalBody').innerHTML = data;
+
+            rebuildValidator(document.getElementById('clienteForm'));
+
+            clienteModalObj.show();
+        }
+
+        // il submit modal
+        async function handleSubmit(e) {
+            e.preventDefault();
+
+            const form = e.target;
+
+            // validazione
+            if (!$(form).valid()) {
+                return;
+            }
+
+            const formData = new FormData(form);
+
+            const url = isEditMode
+                ? '@Url.Action("Edit", "Cliente")/' + currentClienteId
+                : '@Url.Action("Create", "Cliente")';
+
+            const res = await fetch(url, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!res.ok) {
+                alert('Errore di connessione');
+                return;
+            }
+
+            const result = await res.json();
+
+            if (result.success) {
+                clienteModalObj.hide();
+                location.reload();
+            } else {
+                alert(result.message || 'Errore durante il salvataggio');
+            }
+        }
+
+        // aprire delete modal
+        function openDeleteModal(id, name) {
+            currentClienteId = id;
+            document.getElementById('deleteClienteName').textContent = name;
+            deleteModalObj.show();
+        }
+
+        // delete
+        async function handleDelete() {
+            const formData = new FormData();
+            formData.append('__RequestVerificationToken',
+                document.querySelector('input[name="__RequestVerificationToken"]').value);
+
+            const res = await fetch('@Url.Action("Delete", "Cliente")/' + currentClienteId, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!res.ok) {
+                alert('Errore di connessione');
+                return;
+            }
+
+            const result = await res.json();
+
+            if (result.success) {
+                deleteModalObj.hide();
+                location.reload();
+            } else {
+                alert(result.message || 'Errore durante l\'eliminazione');
+            }
+        }
+
+
+        function rebuildValidator(form) {
+            if (form) {
+                $(form).removeData("validator");
+                $(form).removeData("unobtrusiveValidation");
+                $.validator.unobtrusive.parse(form);
+            }
+        }
     </script>
 }
