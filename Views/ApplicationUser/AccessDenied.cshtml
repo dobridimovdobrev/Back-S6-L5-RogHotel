@@ -1,0 +1,29 @@
+﻿@{
+    ViewData["Title"] = "Accesso negato";
+    Layout = "_LayoutLoginRegister";
+}
+
+<div class="login-container">
+    <div class="row g-0 h-100">
+        <div class="col-md-6 d-flex align-items-center justify-content-center">
+            <div class="text-center p-4">
+                <div class="display-4 text-danger mb-3">
+                    <i class="bi bi-shield-exclamation"></i>
+                </div>
+                <h2 class="fw-bold mb-3">Accesso negato</h2>
+                <p class="text-muted mb-4">
+                    Non disponi delle autorizzazioni necessarie per visualizzare questa pagina.
+                </p>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
+                    Torna alla dashboard
+                </a>
+            </div>
+        </div>
+        <div class="col-md-6 position-relative login-image-section">
+            <div class="login-image"
+                 style="background-image: url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=2070');">
+            </div>
+            <div class="login-overlay"></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,269 @@
+﻿@model List<RogHotel.Models.Dto.DipendenteLista>
+@{
+    ViewData["Title"] = "Gestione Dipendenti";
+}
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold mb-1">Gestione Dipendenti</h2>
+                </div>
+                <button type="button" class="btn btn-primary" id="createDipendenteBtn">
+                    <i class="bi bi-plus-lg"></i> Nuovo Dipendente
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="dipendentiTable">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th class="px-4 py-3">Dipendente</th>
+                                    <th class="px-4 py-3">Email</th>
+                                    <th class="px-4 py-3">Ruolo</th>
+                                    <th class="px-4 py-3 text-end">Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model != null && Model.Any())
+                                {
+                                    @foreach (var dipendente in Model)
+                                    {
+                                        <tr>
+                                            <td class="px-4 py-3">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3"
+                                                         style="width: 40px; height: 40px;">
+                                                        <span class="text-primary fw-bold">
+                                                            @dipendente.Nome.Substring(0, 1)@dipendente.Cognome.Substring(0, 1)
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-semibold">@dipendente.Nome @dipendente.Cognome</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-3">@dipendente.Email</td>
+                                            <td class="px-4 py-3">
+                                                <span class="badge bg-secondary">@dipendente.Ruolo</span>
+                                            </td>
+                                            <td class="px-4 py-3 text-end">
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary edit-btn"
+                                                            data-id="@dipendente.IdDipendente" title="Modifica">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+
+                                                    <button type="button" class="btn btn-sm btn-outline-danger delete-btn"
+                                                            data-id="@dipendente.IdDipendente"
+                                                            data-name="@dipendente.Nome @dipendente.Cognome"
+                                                            title="Disattiva">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- modale dipendente -->
+<div class="modal fade" id="dipendenteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dipendenteModalTitle">Dipendente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <form id="dipendenteForm" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body" id="dipendenteModalBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary py-2 px-3" data-bs-dismiss="modal">Annulla</button>
+                    <button type="submit" class="btn btn-primary py-2 px-3">Salva</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<!-- disattiva -->
+<div class="modal fade" id="deleteDipendenteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Conferma Disattivazione</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Sei sicuro di voler disattivare <strong id="deleteDipendenteName"></strong>?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteDipendenteBtn">Disattiva</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        let currentDipendenteId = null;
+        let isEditMode = false;
+
+        let dipendenteModalObj = null;
+        let deleteModalObj = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // datatable
+            $('#dipendentiTable').DataTable({
+                order: [[0, 'asc']]
+            });
+
+            // bootstrap modal
+            dipendenteModalObj = new bootstrap.Modal(document.getElementById('dipendenteModal'));
+            deleteModalObj = new bootstrap.Modal(document.getElementById('deleteDipendenteModal'));
+
+            addEventListeners();
+        });
+
+        function addEventListeners() {
+            // crea
+            document.getElementById('createDipendenteBtn')
+                .addEventListener('click', async () => await openCreateModal());
+
+            const table = document.getElementById('dipendentiTable');
+
+            // modifica
+            table.addEventListener('click', async (e) => {
+                const editBtn = e.target.closest('.edit-btn');
+                if (!editBtn) return;
+
+                const id = editBtn.getAttribute('data-id');
+                await openEditModal(id);
+            });
+
+            // elimina
+            table.addEventListener('click', (e) => {
+                const deleteBtn = e.target.closest('.delete-btn');
+                if (!deleteBtn) return;
+
+                const id = deleteBtn.getAttribute('data-id');
+                const name = deleteBtn.getAttribute('data-name');
+                openDeleteModal(id, name);
+            });
+
+            // submit form
+            document.getElementById('dipendenteForm')
+                .addEventListener('submit', async (e) => await handleSubmit(e));
+
+            // conferma eliminazione
+            document.getElementById('confirmDeleteDipendenteBtn')
+                .addEventListener('click', async () => await handleDelete());
+        }
+
+        async function openCreateModal() {
+            isEditMode = false;
+            document.getElementById('dipendenteModalTitle').textContent = 'Nuovo Dipendente';
+
+            const res = await fetch('@Url.Action("CreateDipendentePartial", "ApplicationUser")');
+            if (!res.ok) { alert('Errore nel caricamento del form'); return; }
+
+            document.getElementById('dipendenteModalBody').innerHTML = await res.text();
+            rebuildValidator(document.getElementById('dipendenteForm'));
+            dipendenteModalObj.show();
+        }
+
+        async function openEditModal(id) {
+            isEditMode = true;
+            currentDipendenteId = id;
+            document.getElementById('dipendenteModalTitle').textContent = 'Modifica Dipendente';
+
+            const res = await fetch('@Url.Action("EditDipendentePartial", "ApplicationUser")/' + id);
+            if (!res.ok) { alert('Errore nel caricamento dei dati'); return; }
+
+            document.getElementById('dipendenteModalBody').innerHTML = await res.text();
+            rebuildValidator(document.getElementById('dipendenteForm'));
+            dipendenteModalObj.show();
+        }
+
+        async function handleSubmit(e) {
+            e.preventDefault();
+
+            const form = e.target;
+
+            // validazione
+            if (!$(form).valid()) return;
+
+            const formData = new FormData(form);
+
+            const url = isEditMode
+                ? '@Url.Action("EditDipendente", "ApplicationUser")/' + currentDipendenteId
+                : '@Url.Action("CreateDipendente", "ApplicationUser")';
+
+            const res = await fetch(url, { method: 'POST', body: formData });
+            if (!res.ok) { alert('Errore di connessione'); return; }
+
+            const result = await res.json();
+
+            if (result.success) {
+                dipendenteModalObj.hide();
+                location.reload();
+            } else {
+                alert(result.message || 'Errore durante il salvataggio');
+            }
+        }
+
+        function openDeleteModal(id, name) {
+            currentDipendenteId = id;
+            document.getElementById('deleteDipendenteName').textContent = name;
+            deleteModalObj.show();
+        }
+
+        async function handleDelete() {
+            const formData = new FormData();
+            formData.append('__RequestVerificationToken',
+                document.querySelector('input[name="__RequestVerificationToken"]').value);
+
+            const res = await fetch('@Url.Action("DeleteDipendente", "ApplicationUser")/' + currentDipendenteId, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!res.ok) { alert('Errore di connessione'); return; }
+
+            const result = await res.json();
+
+            if (result.success) {
+                deleteModalObj.hide();
+                location.reload();
+            } else {
+                alert(result.message || 'Errore durante la disattivazione');
+            }
+        }
+
+        function rebuildValidator(form) {
+            if (!form) return;
+            $(form).removeData("validator");
+            $(form).removeData("unobtrusiveValidation");
+            $.validator.unobtrusive.parse(form);
+        }
+    </script>
+}

@@ -42,22 +42,35 @@
                     <i class="bi bi-calendar-check me-2"></i> Prenotazioni
                 </a>
 
-                <a asp-controller="Cliente" asp-action="Index"
-                   class="list-group-item list-group-item-action @(currentController == "Cliente" ? "active" : "")">
-                    <i class="bi bi-people me-2"></i> Clienti
-                </a>
+                @if (User.IsInRole("Admin") || User.IsInRole("Dipendente"))
+                {
+                    <a asp-controller="Cliente" asp-action="Index"
+                       class="list-group-item list-group-item-action @(currentController == "Cliente" ? "active" : "")">
+                        <i class="bi bi-people me-2"></i> Clienti
+                    </a>
 
-                <a asp-controller="Camera" asp-action="Index"
-                   class="list-group-item list-group-item-action @(currentController == "Camera" ? "active" : "")">
-                    <i class="bi bi-door-open me-2"></i> Camere
-                </a>
+                    <a asp-controller="Camera" asp-action="Index"
+                       class="list-group-item list-group-item-action @(currentController == "Camera" ? "active" : "")">
+                        <i class="bi bi-door-open me-2"></i> Camere
+                    </a>
+                }
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <div class="sidebar-section-title">AMMINISTRAZIONE</div>
+
+                    <a asp-controller="ApplicationUser" asp-action="Index"
+                       class="list-group-item list-group-item-action @(currentController == "ApplicationUser" ? "active" : "")">
+                        <i class="bi bi-person-badge me-2"></i> Dipendenti
+                    </a>
+                }
             </div>
 
             <!-- user info-->
             <div class="sidebar-user border-top p-3 mt-auto">
-                <div class="d-flex align-items-center bg-light rounded-3 p-3">
+                <div class="d-flex align-items-center bg-light rounded-3 p-2">
                     <!-- Icona Sinistra -->
-                    <div class="user-avatar bg-warning text-white rounded-circle d-flex align-items-center justify-content-center me-3">
+                    <div class="user-avatar bg-warning text-white rounded-circle d-flex align-items-center justify-content-center p-3 me-2">
                         <i class="bi bi-person-fill"></i>
                     </div>
 
@@ -72,6 +85,10 @@
                                 else if (User.IsInRole("Dipendente"))
                                 {
                                     <span>Dipendente</span>
+                                }
+                                else if (User.IsInRole("LetturaPrenotazioni"))
+                                {
+                                    <span>Lettura Prenotazioni</span>
                                 }
                                 else
                                 {
@@ -101,23 +118,23 @@
         </div>
 
         <div id="page-content-wrapper">
+            @{
+                var nome = User.FindFirst("Nome")?.Value;
+                var cognome = User.FindFirst("Cognome")?.Value;
+            }
+
             <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom custom-marginTop">
-                <div class="container-fluid">
+                <div class="container-fluid d-flex align-items-center">
                     <button class="btn btn-link" id="sidebarToggle">
                         <i class="bi bi-list fs-4"></i>
                     </button>
 
-                    <form class="d-flex flex-grow-1 mx-4">
-                        <div class="input-group" style="max-width: 500px;">
-                            <span class="input-group-text bg-white border-end-0">
-                                <i class="bi bi-search"></i>
-                            </span>
-                            <input class="form-control border-start-0" type="search" placeholder="Cerca prenotazione, camera o cliente..." />
-                        </div>
-                    </form>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <h3 class="mb-0 ms-3 fw-semibold">Benvenuto @nome @cognome!</h3>
+                    }
                 </div>
             </nav>
-
             <div class="container-fluid p-4">
                 @RenderBody()
             </div>
